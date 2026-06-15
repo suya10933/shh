@@ -1,0 +1,10 @@
+(sym_lib_table
+	(version 7)
+	(lib (name "5034802200") (type "KiCad") (uri "/home/suya/Projects/shh/Hardware/Kicad_Lib/5034802200/5034802200.kicad_sym") (options "") (descr ""))
+	(lib (name "C0805C105K5RACTU") (type "KiCad") (uri "/home/suya/Projects/shh/Hardware/Kicad_Lib/C0805C105K5RACTU/C0805C105K5RACTU.kicad_sym") (options "") (descr ""))
+	(lib (name "C1608X5R1C475K080AC") (type "KiCad") (uri "/home/suya/Projects/shh/Hardware/Kicad_Lib/C1608X5R1C475K080AC/C1608X5R1C475K080AC.kicad_sym") (options "") (descr ""))
+	(lib (name "TPS61169DCKR") (type "KiCad") (uri "/home/suya/Projects/shh/Hardware/Kicad_Lib/TPS61169DCKR/TPS61169DCKR.kicad_sym") (options "") (descr ""))
+	(lib (name "SS14") (type "KiCad") (uri "/home/suya/Projects/shh/Hardware/Kicad_Lib/SS14/SS14.kicad_sym") (options "") (descr ""))
+	(lib (name "LQH44PN4R7MP0L") (type "KiCad") (uri "/home/suya/Projects/shh/Hardware/Kicad_Lib/LQH44PN4R7MP0L/LQH44PN4R7MP0L.kicad_sym") (options "") (descr ""))
+	(lib (name "FH12-30S-0.5SH_55_") (type "KiCad") (uri "/home/suya/Projects/shh/Hardware/Kicad_Lib/FH12-30S-0.5SH_55_/FH12-30S-0.5SH_55_.kicad_sym") (options "") (descr ""))
+)

@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "project": "ER_TFT050-10_CM5IO.kicad_pro",
+  "current": "2026-06-14_1129",
+  "runs": {
+    "2026-06-14_1042": {
+      "source_hashes": {
+        "ER_TFT050-10_CM5IO.kicad_sch": "sha256:03574d87dc8f658bf1d739ae1f4486a0d2ef125441db7589ae8c321364051307",
+        "ER_TFT050-10_CM5IO.kicad_pcb": "sha256:b262ab758804ee6ef4f44d02c41cdbfb64b76d33cde0a469c758e9ca5e46cd13",
+        "schematic.json": "sha256:f05d537f5ea8a7c6d4aaa7f0d5d678b8b2cc14b311ecf70837923c307bc45f86",
+        "pcb.json": "sha256:42b7d2c1b1a801205c73fdad173f3337480e6c11541c4b8c58de24257f948627"
+      },
+      "outputs": {
+        "schematic": "schematic.json",
+        "pcb": "pcb.json",
+        "cross_analysis": "cross_analysis.json",
+        "emc": "emc.json",
+        "thermal": "thermal.json"
+      },
+      "scripts": {
+        "schematic": "analyze_schematic.py ER_TFT050-10_CM5IO.kicad_sch"
+      },
+      "generated": "2026-06-14T11:29:37+09:00",
+      "pinned": false
+    },
+    "2026-06-14_1129": {
+      "source_hashes": {
+        "schematic.json": "sha256:44fa62be846833cb0962c07bb1e71e9f22ad04ff6bc878a841d0a02f14070f6a",
+        "pcb.json": "sha256:e9851bfd913d7e8059ae0d5108ea64bfa9f39a4ce5985a6df64a7dbffd513ffd"
+      },
+      "outputs": {
+        "schematic": "schematic.json",
+        "pcb": "pcb.json",
+        "cross_analysis": "cross_analysis.json",
+        "emc": "emc.json",
+        "thermal": "thermal.json"
+      },
+      "scripts": {
+        "emc": "analyze_emc.py"
+      },
+      "generated": "2026-06-14T11:29:37+09:00",
+      "pinned": false
+    }
+  }
+}
