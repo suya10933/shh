@@ -1,0 +1,4 @@
+[submodule "shh-lfs/kernel/linux"]
+	path = shh-lfs/kernel/linux
+	url = git@github.com:suya10933/linux.git
+	branch = cm4-lfs-rpi-6.12
