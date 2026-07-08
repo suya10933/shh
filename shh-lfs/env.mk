@@ -1,17 +1,20 @@
 # env.mk
 
 PROJECT_ROOT := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
-
-OUT 			?= $(PROJECT_ROOT)out
-DL				?= $(PROJECT_ROOT)dl
+export PROJECT_ROOT
 
 TARGET 			?= aarch64-shh-linux-gnu
 ARCH 			?= arm64
 CROSS_COMPILE 	?= $(TARGET)-
 
-CTNG_PREFIX 	?= $(OUT)/ct-ng
-XTOOLS 			?= $(OUT)/x-tools
-TOOLCHAIN_DIR 	?= $(XTOOLS)/$(TARGET)
+GIT_URL_CT_NG	?= https://github.com/crosstool-ng/crosstool-ng.git
+VERSION_CT_NG	?= crosstool-ng-1.28.0
+CT_NG			?= $(SRC)/ct-ng
+CT_NG_CONFIG	?= $(PROJECT_ROOT)toolchain/.config
+CT_NG_XTOOLS 	?= $(PROJECT_ROOT)toolchain/x-tools
+CT_NG_DL		?= $(PROJECT_ROOT)toolchain/dl
+export CT_NG_XTOOLS CT_NG_DL
 
-export PROJECT_ROOT
-export OUT DL TARGET ARCH CROSS_COMPILE CTNG_PREFIX XTOOLS TOOLCHAIN_DIR
+FW_DL			?= $(PROJECT_ROOT)firmware/dl
+FW_URL 			?= https://raw.githubusercontent.com/raspberrypi/firmware/master/boot
+

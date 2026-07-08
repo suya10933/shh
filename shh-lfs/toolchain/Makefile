@@ -5,16 +5,6 @@ include ../env.mk
 STAMP 			:= $(PROJECT_ROOT)toolchain/stamp
 SRC 			:= $(PROJECT_ROOT)toolchain/crosstool-ng
 
-GIT_URL_CT_NG	:= https://github.com/crosstool-ng/crosstool-ng.git
-VERSION_CT_NG	:= crosstool-ng-1.28.0
-CT_NG			:= $(SRC)/ct-ng
-CT_NG_CONFIG	:= $(PROJECT_ROOT)toolchain/.config
-
-XTOOLS 			:= $(PROJECT_ROOT)toolchain/x-tools
-
-export CT_NG_XTOOLS	:= $(XTOOLS)
-export CT_NG_DL		:= $(PROJECT_ROOT)toolchain/dl
-
 all: xtools
 
 $(STAMP)/.ct-ng:
