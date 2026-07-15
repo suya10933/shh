@@ -1,0 +1,4 @@
+arm_64bit=1
+enable_uart=1
+kernel=kernel8.img
+enable_jtag_gpio=1

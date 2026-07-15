@@ -13,5 +13,26 @@ $(FW_DL)/start4.elf: $(FW_DL)
 $(FW_DL)/fixup4.dat: $(FW_DL)
 	curl -L --fail --retry 3 -o $@ $(FW_URL)/fixup4.dat
 
+.PHONY: install
+install: $(FW_DL)/fixup4.dat $(FW_DL)/start4.elf
+	mkdir -p $(RELEASE_BOOT)
+	cp $(FW)/cmdline.txt \
+		$(RELEASE_BOOT)/
+	cp $(FW)/config.txt \
+		$(RELEASE_BOOT)/
+	cp $(FW_DL)/fixup4.dat \
+		$(RELEASE_BOOT)/
+	cp $(FW_DL)/start4.elf \
+		$(RELEASE_BOOT)/
+	mkdir -p $(DEBUG_BOOT)
+	cp $(FW)/cmdline.txt \
+		$(DEBUG_BOOT)/
+	cp $(FW)/config_debug.txt \
+		$(DEBUG_BOOT)/config.txt
+	cp $(FW_DL)/fixup4.dat \
+		$(DEBUG_BOOT)/
+	cp $(FW_DL)/start4.elf \
+		$(DEBUG_BOOT)/
+
 clean:
 	rm -rf $(FW_DL)

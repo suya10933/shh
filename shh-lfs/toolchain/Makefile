@@ -2,23 +2,18 @@
 
 include ../env.mk
 
-STAMP 			:= $(PROJECT_ROOT)toolchain/stamp
 SRC 			:= $(PROJECT_ROOT)toolchain/crosstool-ng
 
 all: xtools
 
-$(STAMP)/.ct-ng:
-	mkdir -p $(STAMP)
+$(SRC)/ct-ng:
 	git clone $(GIT_URL_CT_NG)
 	cd $(SRC) && git checkout $(VERSION_CT_NG)
 	cd $(SRC) && ./bootstrap
 	cd $(SRC) && ./configure --enable-local
 	$(MAKE) -C $(SRC)
-	touch $@
 
-ct-ng: $(STAMP)/.ct-ng
-
-$(SRC)/.config: $(STAMP)/.ct-ng $(CT_NG_CONFIG)
+$(SRC)/.config: $(SRC)/ct-ng $(CT_NG_CONFIG)
 	cp $(CT_NG_CONFIG) $(SRC)/.config
 	cd $(SRC) && ./ct-ng olddefconfig
 
@@ -30,12 +25,12 @@ menuconfig: $(SRC)/.config
 save_config: $(SRC)/.config
 	cp $(SRC)/.config $(CT_NG_CONFIG)
 
-$(STAMP)/.xtools: $(SRC)/.config
+$(PROJECT_ROOT)toolchain/.stamp.xtools: $(SRC)/.config
 	mkdir -p $(CT_NG_XTOOLS) $(CT_NG_DL)
 	cd $(SRC) && ./ct-ng build
 	touch $@
 
-xtools: $(STAMP)/.xtools
+xtools: $(PROJECT_ROOT)toolchain/.stamp.xtools
 
 clean:
-	rm -rf $(STAMP) $(SRC) $(CT_NG_XTOOLS) $(CT_NG_DL)
+	rm -rf $(SRC) $(CT_NG_XTOOLS) $(CT_NG_DL)
