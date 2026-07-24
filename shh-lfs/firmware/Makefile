@@ -25,8 +25,6 @@ install: $(FW_DL)/fixup4.dat $(FW_DL)/start4.elf
 	cp $(FW_DL)/start4.elf \
 		$(RELEASE_BOOT)/
 	mkdir -p $(DEBUG_BOOT)
-	cp $(FW)/cmdline.txt \
-		$(DEBUG_BOOT)/
 	cp $(FW)/config_debug.txt \
 		$(DEBUG_BOOT)/config.txt
 	cp $(FW_DL)/fixup4.dat \

@@ -48,13 +48,14 @@ install:
 		$(RELEASE_BOOT)/
 	cp $(KERNEL_BUILD)/arch/arm64/boot/dts/overlays/*.dtbo \
 		$(RELEASE_BOOT)/overlays/
-	mkdir -p $(DEBUG_BOOT)/overlays
+	mkdir -p $(DEBUG_BOOT)
+	mkdir -p $(DEBUG_TFTP)/overlays
 	cp $(KERNEL_BUILD_DEBUG)/arch/arm64/boot/Image \
-		$(DEBUG_BOOT)/kernel8.img
+		$(DEBUG_TFTP)/
 	cp $(KERNEL_BUILD_DEBUG)/arch/arm64/boot/dts/broadcom/bcm2711-rpi-cm4.dtb \
-		$(DEBUG_BOOT)/
+		$(DEBUG_TFTP)/
 	cp $(KERNEL_BUILD_DEBUG)/arch/arm64/boot/dts/overlays/*.dtbo \
-		$(DEBUG_BOOT)/overlays/
+		$(DEBUG_TFTP)/overlays/
 
 .PHONY: clean
 clean:

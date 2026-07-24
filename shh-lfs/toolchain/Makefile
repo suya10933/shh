@@ -17,12 +17,12 @@ $(SRC)/.config: $(SRC)/ct-ng $(CT_NG_CONFIG)
 	cp $(CT_NG_CONFIG) $(SRC)/.config
 	cd $(SRC) && ./ct-ng olddefconfig
 
-set_config: $(SRC)/.config
+setconfig: $(SRC)/.config
 
 menuconfig: $(SRC)/.config
 	cd $(SRC) && ./ct-ng menuconfig
 
-save_config: $(SRC)/.config
+saveconfig: $(SRC)/.config
 	cp $(SRC)/.config $(CT_NG_CONFIG)
 
 $(PROJECT_ROOT)toolchain/.stamp.xtools: $(SRC)/.config
