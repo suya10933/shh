@@ -16,16 +16,16 @@ $(FW_DL)/fixup4.dat: $(FW_DL)
 .PHONY: install
 install: $(FW_DL)/fixup4.dat $(FW_DL)/start4.elf
 	mkdir -p $(RELEASE_BOOT)
-	cp $(FW)/cmdline.txt \
+	cp $(FW_ROOT)/cmdline.txt \
 		$(RELEASE_BOOT)/
-	cp $(FW)/config.txt \
+	cp $(FW_ROOT)/config.txt \
 		$(RELEASE_BOOT)/
 	cp $(FW_DL)/fixup4.dat \
 		$(RELEASE_BOOT)/
 	cp $(FW_DL)/start4.elf \
 		$(RELEASE_BOOT)/
 	mkdir -p $(DEBUG_BOOT)
-	cp $(FW)/config_debug.txt \
+	cp $(FW_ROOT)/config_debug.txt \
 		$(DEBUG_BOOT)/config.txt
 	cp $(FW_DL)/fixup4.dat \
 		$(DEBUG_BOOT)/

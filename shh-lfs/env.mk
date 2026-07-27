@@ -22,7 +22,7 @@ CT_NG_DL		?= $(PROJECT_ROOT)toolchain/dl
 CROSS_COMPILE 	?= $(CT_NG_XTOOLS)/$(TARGET)/bin/$(TARGET)-
 export CT_NG_XTOOLS CT_NG_DL CROSS_COMPILE
 
-FW				?= $(PROJECT_ROOT)firmware
+FW_ROOT			?= $(PROJECT_ROOT)firmware
 FW_DL			?= $(FW)/dl
 FW_URL 			?= https://raw.githubusercontent.com/raspberrypi/firmware/master/boot
 
