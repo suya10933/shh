@@ -9,10 +9,6 @@ rootfs="$out/$profile/rootfs"
 image=${2:-"$out/images/shh-$profile.img"}
 boot_mib=${BOOT_MIB:-256}
 
-for file in config.txt cmdline.txt start4.elf fixup4.dat kernel8.img bcm2711-rpi-cm4.dtb; do
-	[[ -f "$boot/$file" ]]
-done
-
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 bootfs="$work/boot.vfat"

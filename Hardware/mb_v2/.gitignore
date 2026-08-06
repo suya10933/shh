@@ -39,3 +39,4 @@ outputs/
 Thumbs.db
 .vscode/
 .idea/
+_restore_backup*

@@ -2,3 +2,6 @@
 	path = shh-lfs/kernel/linux
 	url = git@github.com:suya10933/linux.git
 	branch = cm4-lfs-rpi-6.12
+[submodule "shh-2354a/pico-sdk"]
+	path = shh-2354a/pico-sdk
+	url = https://github.com/raspberrypi/pico-sdk.git

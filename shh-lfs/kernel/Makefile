@@ -1,63 +1,84 @@
-#kernel/Makefile
+# kernel/Makefile
 
 include ../env.mk
 
-all: build build-debug
+KERNEL_OUT			:= $(BUILD_OUT)/kernel
+KERNEL_DOT_CONFIG	:= $(KERNEL_OUT)/.config
+KERNEL_SRC 			:= $(PROJECT_ROOT)kernel/linux
+
+KERNEL_DEFCONFIG	:= $(KERNEL_SRC)/arch/$(ARCH)/configs/$(KERNEL_CONFIG)
+KERNEL_IMAGE		:= $(KERNEL_OUT)/arch/$(ARCH)/boot/Image
+KERNEL_DTB 			:= $(KERNEL_OUT)/arch/$(ARCH)/boot/dts/broadcom/bcm2711-rpi-cm4.dtb
+KERNEL_OVERLAYS		:= $(KERNEL_OUT)/arch/$(ARCH)/boot/dts/overlays
+
+KERNEL_MAKE 		:= $(MAKE) -C $(KERNEL_SRC) \
+						ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) \
+						O=$(KERNEL_OUT)
+
+CONFIG_DEPS			:= $(KERNEL_DEFCONFIG)
+
+ifeq ($(PROFILE),debug)
+CONFIG_DEPS 		+= $(KERNEL_DEBUG_FRAG)
+endif
+
+.PHONY: all
+all: build
+
+$(KERNEL_DOT_CONFIG): $(CONFIG_DEPS)
+	mkdir -p $(KERNEL_OUT)
+	$(KERNEL_MAKE) $(KERNEL_CONFIG)
+ifeq ($(PROFILE),debug)
+	$(KERNEL_SRC)/scripts/kconfig/merge_config.sh \
+		-m -O $(KERNEL_OUT) $(KERNEL_DOT_CONFIG) $(KERNEL_DEBUG_FRAG)
+	$(KERNEL_MAKE) olddefconfig
+endif
 
 .PHONY: build
-build: 
-	mkdir -p $(KERNEL_BUILD)
-	$(MAKE) -C $(KERNEL_SRC) \
-		ARCH=$(ARCH) \
-		O=$(KERNEL_BUILD) \
-		$(KERNEL_CONFIG)
-	$(MAKE) -C $(KERNEL_SRC) \
-		ARCH=$(ARCH) \
-		O=$(KERNEL_BUILD) \
-		CROSS_COMPILE=$(CROSS_COMPILE) \
-		Image modules dtbs
+build: $(KERNEL_DOT_CONFIG)
+	$(KERNEL_MAKE) Image dtbs
 
-.PHONY: build-debug
-build-debug:
-	mkdir -p $(KERNEL_BUILD_DEBUG)
-	$(MAKE) -C $(KERNEL_SRC) \
-		ARCH=$(ARCH) \
-		O=$(KERNEL_BUILD_DEBUG) \
-		$(KERNEL_CONFIG)
-	$(KERNEL_SRC)/scripts/kconfig/merge_config.sh -m \
-		-O $(KERNEL_BUILD_DEBUG) \
-		$(KERNEL_BUILD_DEBUG)/.config \
-		$(KERNEL_DEBUG_CONFIG)
-	$(MAKE) -C $(KERNEL_SRC) \
-		ARCH=$(ARCH) \
-		O=$(KERNEL_BUILD_DEBUG) \
-		CROSS_COMPILE=$(CROSS_COMPILE) \
-		olddefconfig
-	$(MAKE) -C $(KERNEL_SRC) \
-		ARCH=$(ARCH) \
-		O=$(KERNEL_BUILD_DEBUG) \
-		CROSS_COMPILE=$(CROSS_COMPILE) \
-		Image modules dtbs
+.PHONY: menuconfig
+menuconfig: $(KERNEL_DOT_CONFIG)
+	$(KERNEL_MAKE) menuconfig
 
 .PHONY: install
-install:
-	mkdir -p $(RELEASE_BOOT)/overlays
-	cp $(KERNEL_BUILD)/arch/arm64/boot/Image \
-		$(RELEASE_BOOT)/kernel8.img
-	cp $(KERNEL_BUILD)/arch/arm64/boot/dts/broadcom/bcm2711-rpi-cm4.dtb \
-		$(RELEASE_BOOT)/
-	cp $(KERNEL_BUILD)/arch/arm64/boot/dts/overlays/*.dtbo \
-		$(RELEASE_BOOT)/overlays/
-	mkdir -p $(DEBUG_BOOT)
-	mkdir -p $(DEBUG_TFTP)/overlays
-	cp $(KERNEL_BUILD_DEBUG)/arch/arm64/boot/Image \
-		$(DEBUG_TFTP)/
-	cp $(KERNEL_BUILD_DEBUG)/arch/arm64/boot/dts/broadcom/bcm2711-rpi-cm4.dtb \
-		$(DEBUG_TFTP)/
-	cp $(KERNEL_BUILD_DEBUG)/arch/arm64/boot/dts/overlays/*.dtbo \
-		$(DEBUG_TFTP)/overlays/
+install: build
+ifeq ($(PROFILE),debug)
+	install -D -m 0644 \
+		$(KERNEL_IMAGE) \
+		$(DEBUG_NFS)/Image
+
+	install -D -m 0644 \
+		$(KERNEL_DTB) \
+		$(DEBUG_NFS)/bcm2711-rpi-cm4.dtb
+
+	mkdir -p $(DEBUG_NFS)/overlays
+	install -m 0644 \
+		$(KERNEL_OVERLAYS)/*.dtbo \
+		$(DEBUG_NFS)/overlays/
+
+	install -D -m 0644 \
+		$(KERNEL_DTB) \
+		$(BOOT_OUT)/bcm2711-rpi-cm4.dtb
+
+	install -D -m 0644 \
+		$(KERNEL_OVERLAYS)/dwc2.dtbo \
+		$(BOOT_OUT)/overlays/dwc2.dtbo
+else
+	install -D -m 0644 \
+		$(KERNEL_IMAGE) \
+		$(BOOT_OUT)/kernel8.img
+
+	install -D -m 0644 \
+		$(KERNEL_DTB) \
+		$(BOOT_OUT)/bcm2711-rpi-cm4.dtb
+
+	mkdir -p $(BOOT_OUT)/overlays
+	install -m 0644 \
+		$(KERNEL_OVERLAYS)/*.dtbo \
+		$(BOOT_OUT)/overlays/
+endif
 
 .PHONY: clean
 clean:
-	$(MAKE) -C $(KERNEL_SRC) mrproper
-	rm -rf $(KERNEL_BUILD) $(KERNEL_BUILD_DEBUG)
+	rm -rf $(KERNEL_OUT)

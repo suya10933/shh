@@ -2,35 +2,33 @@
 
 include ../env.mk
 
-all: $(FW_DL)/start4.elf $(FW_DL)/fixup4.dat
+.PHONY: all
+all: $(DL)/start4.elf $(DL)/fixup4.dat
 
-$(FW_DL):
-	mkdir -p $@
-
-$(FW_DL)/start4.elf: $(FW_DL)
+$(DL)/start4.elf:
+	mkdir -p $(DL)
 	curl -L --fail --retry 3 -o $@ $(FW_URL)/start4.elf
 
-$(FW_DL)/fixup4.dat: $(FW_DL)
+$(DL)/fixup4.dat:
+	mkdir -p $(DL)
 	curl -L --fail --retry 3 -o $@ $(FW_URL)/fixup4.dat
 
 .PHONY: install
-install: $(FW_DL)/fixup4.dat $(FW_DL)/start4.elf
-	mkdir -p $(RELEASE_BOOT)
-	cp $(FW_ROOT)/cmdline.txt \
-		$(RELEASE_BOOT)/
-	cp $(FW_ROOT)/config.txt \
-		$(RELEASE_BOOT)/
-	cp $(FW_DL)/fixup4.dat \
-		$(RELEASE_BOOT)/
-	cp $(FW_DL)/start4.elf \
-		$(RELEASE_BOOT)/
-	mkdir -p $(DEBUG_BOOT)
+install: $(DL)/fixup4.dat $(DL)/start4.elf
+	mkdir -p $(BOOT_OUT)
+ifeq ($(PROFILE),debug)
 	cp $(FW_ROOT)/config_debug.txt \
-		$(DEBUG_BOOT)/config.txt
-	cp $(FW_DL)/fixup4.dat \
-		$(DEBUG_BOOT)/
-	cp $(FW_DL)/start4.elf \
-		$(DEBUG_BOOT)/
+		$(BOOT_OUT)/config.txt
+else
+	cp $(FW_ROOT)/config_release.txt \
+		$(BOOT_OUT)/config.txt
+	echo $(BOOTARGS) > $(BOOT_OUT)/cmdline.txt
+endif
+	cp $(DL)/fixup4.dat \
+		$(BOOT_OUT)/
+	cp $(DL)/start4.elf \
+		$(BOOT_OUT)/
 
+.PHONY: clean
 clean:
-	rm -rf $(FW_DL)
+	rm -rf $(DL)/start4.elf $(DL)/fixup4.dat
