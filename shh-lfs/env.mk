@@ -41,7 +41,7 @@ export USER_CPPFLAGS USER_CFLAGS
 
 ifeq ($(PROFILE),debug)
 
-BOOTARGS 			:= console=ttyS0,115200n8 earlycon ignore_loglevel loglevel=8 \
+BOOTARGS 			:= conesole=ttyS0,115200n8 earlycon ignore_loglevel loglevel=8 \
 						root=/dev/nfs nfsroot=192.168.7.1:$(ROOTFS),vers=3,tcp,nolock \
 						ip=192.168.7.2:192.168.7.1::255.255.255.0:cm4:usb0:off \
 						g_ether.dev_addr=02:00:00:00:00:02 \

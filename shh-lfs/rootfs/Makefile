@@ -20,3 +20,6 @@ install: all
 .PHONY: clean
 clean:
 	rm -rf $(ROOTFS)
+
+.PHONY: distclean
+distclean: clean
