@@ -1,0 +1,4 @@
+(sym_lib_table
+	(version 7)
+	(lib (name "FFC2B28-22-G_REVA") (type "KiCad") (uri "${KIPRJMOD}/libs/FFC2B28-22-G_REVA/FFC2B28-22-G_REVA.kicad_sym") (options "") (descr ""))
+)
