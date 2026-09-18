@@ -18,6 +18,7 @@ add_executable(shh-2354a
 	main.c
 	status_led.c
 	power_btn.c
+	usbc.c
 )
 
 target_link_libraries(shh-2354a
@@ -25,6 +26,7 @@ target_link_libraries(shh-2354a
 	pico_stdio_uart
 	hardware_clocks
 	hardware_pll
+	hardware_i2c
 )
 
 target_include_directories(shh-2354a

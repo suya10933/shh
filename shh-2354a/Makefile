@@ -38,17 +38,3 @@ flash: build
 
 clean:
 	$(CMAKE) -E remove_directory "$(BUILD_DIR)"
-
-rebuild: clean build
-
-help:
-	@echo "Targets:"
-	@echo "  make            Configure and build $(PROJECT)"
-	@echo "  make flash      Build, verify, and flash with OpenOCD"
-	@echo "  make clean      Remove $(BUILD_DIR)"
-	@echo "  make rebuild    Clean and rebuild"
-	@echo ""
-	@echo "Options (example: make flash JOBS=8 BUILD_TYPE=Debug):"
-	@echo "  BUILD_DIR, BUILD_TYPE, JOBS, CMAKE, OPENOCD"
-	@echo "  OPENOCD_ADAPTER_CFG, OPENOCD_TARGET_CFG"
-	@echo "  CMAKE_CONFIGURE_ARGS, CMAKE_BUILD_ARGS, OPENOCD_ARGS"

@@ -7,9 +7,11 @@
 #include "pico/stdio_uart.h"
 #include "hardware/clocks.h"
 #include "hardware/pll.h"
+#include "hardware/sync.h"
 
 #include "status_led.h"
 #include "power_btn.h"
+#include "usbc.h"
 
 #define PIN_POWER_HOLD		11
 #define PIN_5V_PRE_EN		9
@@ -17,9 +19,19 @@
 
 #define PIN_DEBUG_UART_TX	12
 
-static volatile bool shutdown = false;
+typedef enum {
+	CM4_OFF,
+	CM4_POWERED,
+	CM4_SHUTDOWN_WAIT
+} cm4_state_t;
 
-void configure_clock(void)
+typedef struct {
+	cm4_state_t cm4_state;
+} state_t;
+
+static state_t state;
+
+static void configure_clock(void)
 {
 	clock_stop(clk_gpout0);
 	clock_stop(clk_gpout1);
@@ -33,59 +45,113 @@ void configure_clock(void)
 	return;
 }
 
-void power_on(void)
+static void cm4_on(void)
 {
-	gpio_init(PIN_5V_PRE_EN);
-	gpio_set_dir(PIN_5V_PRE_EN, GPIO_OUT);
-	gpio_init(PIN_5V_EN);
-	gpio_set_dir(PIN_5V_EN, GPIO_OUT);
-	gpio_init(PIN_POWER_HOLD);
-	gpio_set_dir(PIN_POWER_HOLD, GPIO_OUT);
-
-	sleep_ms(500);
-
-	gpio_put(PIN_POWER_HOLD, 1);
 	gpio_put(PIN_5V_PRE_EN, 1);
 	sleep_ms(100);
 	gpio_put(PIN_5V_EN, 1);
 	return;
 }
 
-void power_btn(void)
+static void cm4_off(void)
 {
+	gpio_put(PIN_5V_EN, 0);
+	sleep_ms(100);
+	gpio_put(PIN_5V_PRE_EN, 0);
 	return;
 }
 
-void shutdown_handle(void)
+static void power_hold(void)
 {
-	shutdown = true;
+	gpio_init(PIN_POWER_HOLD);
+	gpio_put(PIN_POWER_HOLD, 1);
+	gpio_set_dir(PIN_POWER_HOLD, GPIO_OUT);
+	return;
+}
+
+static void power_release(void)
+{
+	usbc_cleanup();
+	set_led_state(LED_STATE_OFF);
+	gpio_put(PIN_POWER_HOLD, 0);
+	for (;;)
+		__wfi();
 	return;
 }
 
 int main(void)
 {
+	power_hold();
+	init_power_btn();
 	init_status_led();
-	power_on();
 	configure_clock();
+	init_usbc();
 
 	stdio_uart_init_full(uart0, 115200, PIN_DEBUG_UART_TX, -1);
 
-	init_power_btn(power_btn, shutdown_handle);
+	gpio_init(PIN_5V_PRE_EN);
+	gpio_put(PIN_5V_PRE_EN, 0);
+	gpio_set_dir(PIN_5V_PRE_EN, GPIO_OUT);
+	gpio_init(PIN_5V_EN);
+	gpio_put(PIN_5V_EN, 0);
+	gpio_set_dir(PIN_5V_EN, GPIO_OUT);
 
-	//printf("clk_ref : %lu\n", (uint32_t)clock_get_hz(clk_ref));
-	//printf("clk_sys : %lu\n", (uint32_t)clock_get_hz(clk_sys));
-	//printf("clk_peri : %lu\n", (uint32_t)clock_get_hz(clk_peri));
+	if (power_btn_get())
+	{
+		cm4_on();
+		state.cm4_state = CM4_POWERED;
+		set_led_state(LED_STATE_LOADING);
+	}
+	else
+	{
+		state.cm4_state = CM4_OFF;
+		set_led_state(LED_STATE_ALIVE);
+	}
 
-	set_led_state(LED_STATE_LOADING);
+
+	power_btn_event_t power_btn_event = POWER_BTN_NONE;
+	usbc_state_t usbc_state = USBC_UNKNOWN;
 
 	for (;;)
 	{
-		if (shutdown)
+		usbc_handle();
+		power_btn_handle();
+
+		power_btn_event = power_btn_get_event();
+		usbc_state = usbc_get_state();
+
+		switch(state.cm4_state)
 		{
-			set_led_state(LED_STATE_OFF);
-			gpio_put(PIN_POWER_HOLD, 0);
-			for (;;) {;}
+		case CM4_OFF :
+			if (power_btn_event == POWER_BTN_SHORT ||
+				power_btn_event == POWER_BTN_LONG)
+			{
+				cm4_on();
+				state.cm4_state = CM4_POWERED;
+				set_led_state(LED_STATE_LOADING);
+			} else if (usbc_state == USBC_DETACHED)
+			{
+				power_release();
+			}
+			break;
+		case CM4_POWERED :
+			if (power_btn_event == POWER_BTN_SHORT)
+			{
+				// pass cm4 shutdown signal;
+			} else if (power_btn_event == POWER_BTN_LONG)
+			{
+				cm4_off();
+				state.cm4_state = CM4_OFF;
+				set_led_state(LED_STATE_OFF);
+			}
+			break;
+		case CM4_SHUTDOWN_WAIT :
+			// 
+			break;
 		}
+
+
+		sleep_ms(1);
 	}
 
 	return 0;

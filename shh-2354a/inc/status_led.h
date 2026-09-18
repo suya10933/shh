@@ -3,6 +3,8 @@
 #ifndef STATUS_LED_H
 #define STATUS_LED_H
 
+#include <stdint.h>
+
 #define PIN_STATUS_LED		22
 #define LED_STATE_COUNT		5
 

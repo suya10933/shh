@@ -4,69 +4,88 @@
 #include <stdint.h>
 
 #include "pico/stdlib.h"
+#include "hardware/sync.h"
 #include "power_btn.h"
 
 #define DEBOUNCE_DELAY_MS	10
-#define SHUTDOWN_DELAY_MS	1000
+#define LONG_DELAY_MS	1000
 
-static alarm_id_t debounce_alarm_id;
-static alarm_id_t shutdown_alarm_id;
 static volatile bool power_btn_pressed;
-static void (*power_btn_callback)(void);
-static void (*shutdown_callback)(void);
 
-static int64_t shutdown_alarm(alarm_id_t id, void *user_data)
+static absolute_time_t next_handle;
+
+static power_btn_event_t power_btn_event = POWER_BTN_NONE; 
+
+void init_power_btn(void)
 {
-	shutdown_callback();
-	return 0;
-}
-
-static int64_t debound_alarm(alarm_id_t id, void *user_data)
-{
-	power_btn_callback();
-	shutdown_alarm_id = add_alarm_in_ms(SHUTDOWN_DELAY_MS,
-		shutdown_alarm, NULL, false);
-
-	debounce_alarm_id = 0;
-	return 0;
-}
-
-static void power_btn_irq(uint gpio, uint32_t events)
-{
-	if (gpio == PIN_POWER_BTN)
-	{
-		if (events & GPIO_IRQ_EDGE_FALL)
-		{
-			if (debounce_alarm_id)
-				cancel_alarm(debounce_alarm_id);
-
-			debounce_alarm_id = add_alarm_in_ms(DEBOUNCE_DELAY_MS,
-				debound_alarm, NULL, false);
-		} else if (events & GPIO_IRQ_EDGE_RISE)
-		{
-			if (debounce_alarm_id)
-				cancel_alarm(debounce_alarm_id);
-			if (shutdown_alarm_id)
-				cancel_alarm(shutdown_alarm_id);
-		}
-	}
-	return;
-}
-
-void init_power_btn(void (*_power_btn_callback)(void),
-	void (*_shutdown_callback)(void))
-{
-	debounce_alarm_id = 0;
-	power_btn_pressed = false;
-	power_btn_callback = _power_btn_callback;
-	shutdown_callback = _shutdown_callback;
 	gpio_init(PIN_POWER_BTN);
 	gpio_set_dir(PIN_POWER_BTN, GPIO_IN);
-
-	gpio_set_irq_enabled_with_callback(PIN_POWER_BTN,
-		GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE,
-		true, power_btn_irq);
+	power_btn_event = POWER_BTN_NONE;
 
 	return;
 }
 
+bool power_btn_get(void)
+{
+	return (gpio_get(PIN_POWER_BTN) == 0);
+}
+
+power_btn_event_t power_btn_get_event(void)
+{
+	power_btn_event_t ret = power_btn_event;
+	power_btn_event = POWER_BTN_NONE;
+	return ret;
+}
+
+void power_btn_handle(void)
+{
+	if (!time_reached(next_handle))
+		return;
+
+	next_handle = make_timeout_time_ms(2);
+
+	static bool last_btn = false;
+	static bool curr_btn = false;
+	static bool is_pressed = false;
+
+	static bool short_flag = false;
+
+	static absolute_time_t short_timer = 0;
+	static absolute_time_t long_timer = 0;
+	curr_btn = (gpio_get(PIN_POWER_BTN) == false);
+
+	if (last_btn == false && curr_btn == true &&
+		is_pressed == false)
+	{
+		is_pressed = true;
+		short_timer = make_timeout_time_ms(DEBOUNCE_DELAY_MS);
+		long_timer = make_timeout_time_ms(LONG_DELAY_MS);
+	}
+
+	if (last_btn == true && curr_btn == false &&
+		is_pressed == true)
+	{
+		is_pressed = false;
+		if (short_flag)
+		{
+			power_btn_event = POWER_BTN_SHORT;
+			short_flag = false;
+		}
+	}
+
+	if (is_pressed)
+	{
+		if (time_reached(short_timer))
+		{
+			short_flag = true;
+		}
+		if (time_reached(long_timer))
+		{
+			short_flag = false;
+			power_btn_event = POWER_BTN_LONG;
+			is_pressed = false;
+		}
+	}
+
+	last_btn = curr_btn;
+}
