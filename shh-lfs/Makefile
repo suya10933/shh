@@ -70,4 +70,5 @@ distclean:
 	$(MAKE) -C kernel clean
 	$(MAKE) -C firmware clean
 	$(MAKE) -C u-boot clean
+	rm -rf $(DL)
 	rm -rf $(OUT)
