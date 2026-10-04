@@ -11,7 +11,8 @@
 
 #include "status_led.h"
 #include "power_btn.h"
-#include "usbc.h"
+#include "pm.h"
+#include "cm4_spi.h"
 
 #define PIN_POWER_HOLD		11
 #define PIN_5V_PRE_EN		9
@@ -50,6 +51,7 @@ static void cm4_on(void)
 	gpio_put(PIN_5V_PRE_EN, 1);
 	sleep_ms(100);
 	gpio_put(PIN_5V_EN, 1);
+	cm4_spi_enable();
 	return;
 }
 
@@ -58,6 +60,7 @@ static void cm4_off(void)
 	gpio_put(PIN_5V_EN, 0);
 	sleep_ms(100);
 	gpio_put(PIN_5V_PRE_EN, 0);
+	cm4_spi_disable();
 	return;
 }
 
@@ -71,7 +74,7 @@ static void power_hold(void)
 
 static void power_release(void)
 {
-	usbc_cleanup();
+	pm_cleanup();
 	set_led_state(LED_STATE_OFF);
 	gpio_put(PIN_POWER_HOLD, 0);
 	for (;;)
@@ -85,7 +88,8 @@ int main(void)
 	init_power_btn();
 	init_status_led();
 	configure_clock();
-	init_usbc();
+	init_pm();
+	init_cm4_spi();
 
 	stdio_uart_init_full(uart0, 115200, PIN_DEBUG_UART_TX, -1);
 
@@ -110,15 +114,15 @@ int main(void)
 
 
 	power_btn_event_t power_btn_event = POWER_BTN_NONE;
-	usbc_state_t usbc_state = USBC_UNKNOWN;
+	pm_state_t pm_state = USBC_UNKNOWN;
 
 	for (;;)
 	{
-		usbc_handle();
+		pm_handle();
 		power_btn_handle();
 
 		power_btn_event = power_btn_get_event();
-		usbc_state = usbc_get_state();
+		pm_state = pm_get_state();
 
 		switch(state.cm4_state)
 		{
@@ -129,7 +133,7 @@ int main(void)
 				cm4_on();
 				state.cm4_state = CM4_POWERED;
 				set_led_state(LED_STATE_LOADING);
-			} else if (usbc_state == USBC_DETACHED)
+			} else if (pm_state == USBC_DETACHED)
 			{
 				power_release();
 			}
@@ -149,9 +153,6 @@ int main(void)
 			// 
 			break;
 		}
-
-
-		sleep_ms(1);
 	}
 
 	return 0;
