@@ -38,7 +38,7 @@ saveconfig: $(CTNG_DOT_CONFIG)
 
 .PHONY: clean
 clean:
-	rm -rf $(XTOOLS) $(XTOOLS_STAMP)
+	rm -rf $(XTOOLS) $(CTNG_STAMP) $(XTOOLS_STAMP)
 
 .PHONY: distclean
 distclean:

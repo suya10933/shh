@@ -9,7 +9,7 @@ TARGET 			:= $(BUILD_DIR)/shh-init
 
 SRC				:= init.c
 
-CFLAGS 			+= -Wall -Wextra -Werror $(USER_CFLAGS) $(USER_CPPFLAGS)
+CFLAGS 			+= -Wextra -Werror $(USER_CFLAGS) $(USER_CPPFLAGS)
 
 LDFLAGS 		+= -static
 

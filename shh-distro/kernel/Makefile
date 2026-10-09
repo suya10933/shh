@@ -8,7 +8,7 @@ KERNEL_SRC 			:= $(PROJECT_ROOT)kernel/linux
 
 KERNEL_DEFCONFIG	:= $(KERNEL_SRC)/arch/$(ARCH)/configs/$(KERNEL_CONFIG)
 KERNEL_IMAGE		:= $(KERNEL_OUT)/arch/$(ARCH)/boot/Image
-KERNEL_DTB 			:= $(KERNEL_OUT)/arch/$(ARCH)/boot/dts/broadcom/bcm2711-rpi-cm4.dtb
+KERNEL_DTB 			:= $(KERNEL_OUT)/arch/$(ARCH)/boot/dts/broadcom/bcm2711-shh.dtb
 KERNEL_OVERLAYS		:= $(KERNEL_OUT)/arch/$(ARCH)/boot/dts/overlays
 
 KERNEL_MAKE 		:= $(MAKE) -C $(KERNEL_SRC) \
@@ -50,7 +50,7 @@ ifeq ($(PROFILE),debug)
 
 	install -D -m 0644 \
 		$(KERNEL_DTB) \
-		$(DEBUG_NFS)/bcm2711-rpi-cm4.dtb
+		$(DEBUG_NFS)/bcm2711-shh.dtb
 
 	mkdir -p $(DEBUG_NFS)/overlays
 	install -m 0644 \
@@ -71,7 +71,7 @@ else
 
 	install -D -m 0644 \
 		$(KERNEL_DTB) \
-		$(BOOT_OUT)/bcm2711-rpi-cm4.dtb
+		$(BOOT_OUT)/bcm2711-shh.dtb
 
 	mkdir -p $(BOOT_OUT)/overlays
 	install -m 0644 \

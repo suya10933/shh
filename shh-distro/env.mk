@@ -77,6 +77,9 @@ UBOOT_BOOTCMD		?= bind usb_gadget 0 usb_ether; \
 						setenv ethact usb_ether; \
 						setenv ethprime usb_ether; \
 						setenv ethrotate no; \
+						setenv ipaddr 192.168.7.2; \
+						setenv netmask 255.255.255.0; \
+						setenv gatewayip 0.0.0.0; \
 						setenv ipaddr1 192.168.7.2; \
 						setenv netmask1 255.255.255.0; \
 						setenv gatewayip1 0.0.0.0; \
@@ -84,7 +87,7 @@ UBOOT_BOOTCMD		?= bind usb_gadget 0 usb_ether; \
 						setenv nfsserverip 192.168.7.1; \
 						setenv fdtoverlay_addr_r 0x05800000; \
 						nfs $${kernel_addr_r} $${serverip}:$(DEBUG_NFS)/Image; \
-						nfs $${fdt_addr_r} $${serverip}:$(DEBUG_NFS)/bcm2711-rpi-cm4.dtb; \
+						nfs $${fdt_addr_r} $${serverip}:$(DEBUG_NFS)/bcm2711-shh.dtb; \
 						fdt addr $${fdt_addr_r}; \
 						fdt resize 0x10000; \
 						nfs $${fdtoverlay_addr_r} $${serverip}:$(DEBUG_NFS)/overlays/uart1.dtbo; \

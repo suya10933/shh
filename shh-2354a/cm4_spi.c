@@ -166,8 +166,14 @@ void init_cm4_spi(void)
 	dma_rx = dma_claim_unused_channel(true);
 	dma_tx = dma_claim_unused_channel(true);
 
-	for (uint8_t i = 0; i < 128; ++i)
-		ram[i] = 128 - i;
+	ram[0] = 0xDE;
+	ram[1] = 0xAD;
+	ram[2] = 0xBE;
+	ram[3] = 0xEF;
+	for (uint8_t i = 0; i < 64; ++i)
+	{
+		ram[4 + i] = i;
+	}
 
 	return;
 }
